@@ -34,6 +34,14 @@ FLUTTER_ASSERT_ARC
     return NO;
   }
 
+<<<<<<< Updated upstream
+=======
+  // If VoiceOver is on, unless there is an accessibility label, return false.
+  if ([self.semanticsObject bridge]->isVoiceOverRunning()) {
+    return self.semanticsObject.accessibilityLabel.length > 0;
+  }
+
+>>>>>>> Stashed changes
   if (self.semanticsObject.isAccessibilityElement) {
     return YES;
   }

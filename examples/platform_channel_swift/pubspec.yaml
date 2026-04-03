@@ -1,7 +1,12 @@
 name: platform_channel_swift
 
 environment:
+<<<<<<< Updated upstream
   sdk: ^3.9.0-0
+=======
+  sdk: ^3.10.0-0
+  flutter: '>=3.41.0'
+>>>>>>> Stashed changes
 
 resolution: workspace
 
