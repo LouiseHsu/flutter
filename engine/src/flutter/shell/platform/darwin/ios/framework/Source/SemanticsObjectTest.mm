@@ -69,6 +69,43 @@ const float kFloatCompareEpsilon = 0.001;
   XCTAssertNil(child.parent);
 }
 
+- (void)testSetChildrenInHitTestOrderDoesNotModifyParent {
+  fml::WeakPtrFactory<flutter::AccessibilityBridgeIos> factory(
+      new flutter::testing::MockAccessibilityBridge());
+  fml::WeakPtr<flutter::AccessibilityBridgeIos> bridge = factory.GetWeakPtr();
+  SemanticsObject* traversalParent = [[SemanticsObject alloc] initWithBridge:bridge uid:0];
+  SemanticsObject* hitTestParent = [[SemanticsObject alloc] initWithBridge:bridge uid:1];
+  SemanticsObject* child = [[SemanticsObject alloc] initWithBridge:bridge uid:2];
+
+  traversalParent.children = @[ child ];
+  XCTAssertEqual(child.parent, traversalParent);
+
+  hitTestParent.childrenInHitTestOrder = @[ child ];
+  XCTAssertEqual(child.parent, traversalParent);
+
+  hitTestParent.childrenInHitTestOrder = @[];
+  XCTAssertEqual(child.parent, traversalParent);
+}
+
+- (void)testDeallocDoesNotClearReparentedChildParent {
+  fml::WeakPtrFactory<flutter::AccessibilityBridgeIos> factory(
+      new flutter::testing::MockAccessibilityBridge());
+  fml::WeakPtr<flutter::AccessibilityBridgeIos> bridge = factory.GetWeakPtr();
+  SemanticsObject* child = [[SemanticsObject alloc] initWithBridge:bridge uid:2];
+  SemanticsObject* newParent = [[SemanticsObject alloc] initWithBridge:bridge uid:1];
+
+  @autoreleasepool {
+    SemanticsObject* oldParent = [[SemanticsObject alloc] initWithBridge:bridge uid:0];
+    oldParent.children = @[ child ];
+    XCTAssertEqual(child.parent, oldParent);
+
+    newParent.children = @[ child ];
+    XCTAssertEqual(child.parent, newParent);
+  }
+
+  XCTAssertEqual(child.parent, newParent);
+}
+
 - (void)testAccessibilityHitTestFocusAtLeaf {
   fml::WeakPtrFactory<flutter::AccessibilityBridgeIos> factory(
       new flutter::testing::MockAccessibilityBridge());
